@@ -1,49 +1,48 @@
 import * as React from 'react';
-import { Button, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen';
+import DetailsScreen from './screens/DetailsScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen'; 
+import * as SplashScreen from 'expo-splash-screen';
 
-function HomeScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
-      />
-    </View>
-  );
-}
-
-function DetailsScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Details Screen</Text>
-      <Button
-        title="Go to Details... again"
-        onPress={() => navigation.push('Details')}
-      />
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-      <Button title="Go back" onPress={() => navigation.goBack()} />
-      <Button
-        title="Go back to first screen in stack"
-        onPress={() => navigation.popToTop()}
-      />
-    </View>
-  );
-}
+SplashScreen.preventAutoHideAsync();
+setTimeout(SplashScreen.hideAsync, 2500); //this makes sure user can see splash screen
 
 const Stack = createNativeStackNavigator();
 
-function App() {
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
+      <Stack.Navigator>
+        {/* If user is not logged in, show LoginScreen */}
+        {!isLoggedIn ? (
+          <><Stack.Screen name="Login">
+            {(props) => <LoginScreen {...props} onLogin={handleLogin} />}
+          </Stack.Screen><Stack.Screen name="Signup" component={SignupScreen} /></> 
+        ) : (
+          <>
+            <Stack.Screen name="Home">
+              {(props) => <HomeScreen {...props} onLogout={handleLogout} />}
+            </Stack.Screen>
+            <Stack.Screen name="Details" component={DetailsScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-export default App;
